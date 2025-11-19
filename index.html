@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To: 小菲 (臭姐姐)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
@@ -13,10 +16,10 @@
             theme: {
                 extend: {
                     colors: {
-                        'love-bg': '#FDFBF7',
-                        'love-pink': '#ECC8C5',
-                        'love-accent': '#D4878C',
-                        'text-main': '#4A4A4A',
+                        'love-bg': '#FDFBF7',   // 奶油白背景
+                        'love-pink': '#ECC8C5', // 灰粉色
+                        'love-accent': '#D4878C', // 强调色
+                        'text-main': '#4A4A4A', // 主要文字色
                     },
                     fontFamily: {
                         serif: ['"Noto Serif SC"', 'serif'],
@@ -34,7 +37,7 @@
     </script>
 
     <style>
-        /* 自定义动画 */
+        /* === 自定义动画与样式 === */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
@@ -45,7 +48,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 玻璃拟态背景 */
+        /* 玻璃拟态卡片效果 */
         .glass-card {
             background: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(12px);
@@ -54,7 +57,7 @@
             box-shadow: 0 8px 32px 0 rgba(236, 200, 197, 0.2);
         }
 
-        /* 柔和的光斑背景 */
+        /* 背景光斑 */
         .blob {
             position: absolute;
             border-radius: 50%;
@@ -63,12 +66,29 @@
             z-index: -1;
         }
         
+        /* 按钮悬浮动效 */
         .love-btn {
             transition: all 0.3s ease;
         }
         .love-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(212, 135, 140, 0.3);
+        }
+
+        /* 自定义滚动条 (用于信件) */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #ECC8C5; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #D4878C; 
         }
     </style>
 </head>
@@ -78,7 +98,7 @@
     <div class="blob bg-yellow-100 w-80 h-80 bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
     <div class="blob bg-purple-100 w-64 h-64 top-1/2 right-10 opacity-40"></div>
 
-    <nav class="w-full p-6 flex justify-between items-center max-w-6xl mx-auto">
+    <nav class="w-full p-6 flex justify-between items-center max-w-6xl mx-auto relative z-20">
         <div class="text-2xl font-hand text-love-accent tracking-widest">X & Me</div>
         <div class="px-4 py-1.5 rounded-full glass-card text-sm font-medium text-gray-500 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
@@ -86,7 +106,7 @@
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 pt-12 pb-20 flex flex-col items-center justify-center text-center z-10 relative">
+    <main class="container mx-auto px-6 pt-8 pb-20 flex flex-col items-center justify-center text-center z-10 relative">
         
         <div class="text-6xl mb-6 animate-float cursor-pointer hover:scale-110 transition-transform duration-300" onclick="createHeart(event)">
             💌
@@ -102,7 +122,7 @@
             </h1>
             <p class="text-gray-500 mt-6 max-w-lg mx-auto text-lg font-light leading-relaxed">
                 虽然你有时候很凶，还是个“臭姐姐”，<br>
-                但也是我心尖上最柔软的那个宝贝。
+                但也是我心尖上最柔软的那个<b>宝贝</b>。
             </p>
         </div>
 
@@ -136,11 +156,11 @@
         </div>
 
         <div class="mt-16 flex flex-col md:flex-row gap-4 opacity-0" style="animation: fadeIn 1.5s ease-out 0.8s forwards;">
-            <button class="love-btn bg-gradient-to-r from-love-accent to-pink-400 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-pink-200/50 flex items-center justify-center gap-2">
+            <button onclick="openModal('letter-modal')" class="love-btn bg-gradient-to-r from-love-accent to-pink-400 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-pink-200/50 flex items-center justify-center gap-2">
                 <i class="fa-regular fa-envelope"></i>
                 查看告白信
             </button>
-            <button class="love-btn glass-card px-10 py-4 rounded-full font-bold text-gray-600 hover:text-love-accent flex items-center justify-center gap-2">
+            <button onclick="openModal('coupon-modal')" class="love-btn glass-card px-10 py-4 rounded-full font-bold text-gray-600 hover:text-love-accent flex items-center justify-center gap-2">
                 <i class="fa-solid fa-ticket"></i>
                 兑换贴贴券
             </button>
@@ -148,11 +168,86 @@
 
     </main>
 
-    <footer class="absolute bottom-4 w-full text-center text-xs text-gray-400 font-light">
+    <footer class="absolute bottom-4 w-full text-center text-xs text-gray-400 font-light z-10">
         Made with <i class="fa-solid fa-heart text-red-400 mx-1 animate-pulse"></i> for Xiao Fei
     </footer>
 
+    <div id="letter-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0" id="letter-overlay" onclick="closeModal('letter-modal')"></div>
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-2xl h-[80vh] bg-[#FDFBF7] rounded-xl shadow-2xl transform scale-95 opacity-0 transition-all duration-500 flex flex-col overflow-hidden" id="letter-content">
+            <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');"></div>
+            
+            <button onclick="closeModal('letter-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-love-accent z-10 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="overflow-y-auto p-8 md:p-12 custom-scrollbar relative z-0 h-full">
+                <p class="font-hand text-xl text-gray-500 mb-8 text-right">2025.11.19</p>
+                
+                <h2 class="font-serif text-2xl font-bold text-gray-800 mb-6">致我亲爱的小菲：</h2>
+                
+                <div class="font-serif text-lg text-gray-700 leading-loose space-y-6">
+                    <p>展信佳。</p>
+                    <p>
+                        其实我并不是一个特别擅长表达的人，尤其是在面对你的时候。有时候故意惹你生气，喊你“臭姐姐”，其实是因为看到你炸毛的样子觉得特别可爱，又或者，只是想多博取一点你的注意力。
+                    </p>
+                    <p>
+                        最近我常在想，什么是最好的爱呢？大概就是，即使我看过无数风景，依然觉得你是我眼中最独特的色彩。
+                    </p>
+                    <p>
+                        谢谢你包容我的小脾气，也谢谢你愿意做我的软肋和铠甲。未来的路还很长，我想牵着你的手，从清晨到日暮，从心动到古稀。
+                    </p>
+                    <p>
+                        这封信写得很短，但爱意很长。
+                    </p>
+                </div>
+
+                <div class="mt-12 text-right mb-8">
+                    <p class="font-serif text-gray-600">永远爱你的，</p>
+                    <p class="font-hand text-3xl text-love-accent mt-2 transform -rotate-6 inline-block">臭弟弟</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="coupon-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0" id="coupon-overlay" onclick="closeModal('coupon-modal')"></div>
+        
+        <div class="relative w-11/12 max-w-md bg-white rounded-2xl shadow-2xl transform scale-95 opacity-0 transition-all duration-500 overflow-hidden" id="coupon-content">
+            <div class="h-3 bg-gradient-to-r from-love-pink to-love-accent"></div>
+            
+            <div class="p-8 text-center relative">
+                <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-800/60 backdrop-blur-sm rounded-full"></div> 
+                <div class="absolute top-1/2 -right-3 w-6 h-6 bg-gray-800/60 backdrop-blur-sm rounded-full"></div>
+
+                <h3 class="text-gray-400 text-xs tracking-[0.3em] uppercase mb-2">Exclusive Ticket</h3>
+                <h2 class="font-serif text-3xl font-bold text-love-accent mb-2">无限期贴贴券</h2>
+                <p class="text-gray-500 text-sm mb-6">凭此券可兑换 "臭弟弟" 的超级拥抱一次</p>
+                
+                <div class="w-full border-b-2 border-dashed border-gray-200 my-6 relative"></div>
+
+                <div class="space-y-2 text-xs text-gray-400 mb-8">
+                    <p>有效期：永久有效</p>
+                    <p>适用范围：仅限小菲使用</p>
+                    <p>特殊条款：最终解释权归发券人所有</p>
+                </div>
+
+                <button id="redeem-btn" onclick="redeemCoupon()" class="w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-all shadow-lg active:scale-95">
+                    立即兑换
+                </button>
+
+                <div id="stamp" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-love-accent rounded-full flex items-center justify-center opacity-0 pointer-events-none transform scale-150 rotate-[-20deg] transition-all duration-300 z-20 mix-blend-multiply">
+                    <div class="w-28 h-28 border-2 border-love-accent rounded-full flex items-center justify-center">
+                        <span class="text-love-accent font-black text-xl uppercase transform rotate-[-10deg]">已兑换<br>REDEEMED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // --- 爱心点击特效 ---
         function createHeart(event) {
             const heart = document.createElement('div');
             heart.innerHTML = '❤';
@@ -164,31 +259,132 @@
             heart.style.pointerEvents = 'none';
             heart.style.transform = 'translate(-50%, -50%)';
             heart.style.animation = 'floatUp 1s ease-out forwards';
+            heart.style.zIndex = '100'; 
             
             document.body.appendChild(heart);
 
-            // 动态添加keyframe
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @keyframes floatUp {
-                    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                    100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
-                }
-            `;
-            document.head.appendChild(style);
+            // 动态添加动画样式
+            if(!document.getElementById('heart-style')) {
+                const style = document.createElement('style');
+                style.id = 'heart-style';
+                style.innerHTML = `
+                    @keyframes floatUp {
+                        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
-            setTimeout(() => {
-                heart.remove();
-                style.remove();
-            }, 1000);
+            setTimeout(() => { heart.remove(); }, 1000);
         }
 
-        // 全局点击效果
+        // 全局点击监听 (排除按钮和弹窗内容)
         document.addEventListener('click', function(e) {
-            if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+            const isButton = e.target.closest('button');
+            const isModalContent = e.target.closest('#letter-content') || e.target.closest('#coupon-content');
+            if(!isButton && !isModalContent) {
                 createHeart(e);
             }
         });
+
+        // --- 模态框控制 ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const overlay = modal.querySelector('div[id$="-overlay"]');
+            const content = modal.querySelector('div[id$="-content"]');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                content.classList.remove('opacity-0', 'scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const overlay = modal.querySelector('div[id$="-overlay"]');
+            const content = modal.querySelector('div[id$="-content"]');
+            
+            overlay.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('opacity-0', 'scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if(modalId === 'coupon-modal') resetCoupon();
+            }, 300);
+        }
+
+        // --- 优惠券逻辑 ---
+        function redeemCoupon() {
+            const btn = document.getElementById('redeem-btn');
+            const stamp = document.getElementById('stamp');
+            
+            // 按钮状态改变
+            btn.innerText = "兑换成功！";
+            btn.className = "w-full py-3 rounded-xl bg-green-500 text-white font-bold shadow-lg cursor-default";
+            btn.disabled = true;
+
+            // 盖章动画
+            stamp.classList.remove('opacity-0', 'scale-150');
+            stamp.classList.add('opacity-80', 'scale-100');
+
+            // 触发撒花
+            for(let i=0; i<30; i++) {
+                setTimeout(createConfetti, i * 50);
+            }
+        }
+
+        function resetCoupon() {
+            const btn = document.getElementById('redeem-btn');
+            const stamp = document.getElementById('stamp');
+            
+            setTimeout(() => {
+                btn.innerText = "立即兑换";
+                btn.className = "w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-all shadow-lg active:scale-95";
+                btn.disabled = false;
+                
+                stamp.classList.add('opacity-0', 'scale-150');
+                stamp.classList.remove('opacity-80', 'scale-100');
+            }, 300);
+        }
+
+        // --- 撒花特效 ---
+        function createConfetti() {
+            const colors = ['#ECC8C5', '#D4878C', '#F7E7CE', '#FFD700'];
+            const confetti = document.createElement('div');
+            const content = document.getElementById('coupon-content');
+            
+            // 防止 content 找不到报错
+            if (!content) return;
+
+            const rect = content.getBoundingClientRect();
+            
+            confetti.style.position = 'fixed';
+            confetti.style.left = (rect.left + rect.width / 2) + 'px';
+            confetti.style.top = (rect.top + rect.height / 2) + 'px';
+            confetti.style.width = '8px';
+            confetti.style.height = '8px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = '50%';
+            confetti.style.zIndex = '60';
+            
+            const x = (Math.random() - 0.5) * 300;
+            const y = (Math.random() - 0.5) * 300;
+            
+            confetti.style.transition = 'all 1s ease-out';
+            document.body.appendChild(confetti);
+            
+            // 下一帧触发位移
+            requestAnimationFrame(() => {
+                confetti.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random()*360}deg)`;
+                confetti.style.opacity = 0;
+            });
+
+            setTimeout(() => confetti.remove(), 1000);
+        }
     </script>
 </body>
 </html>
