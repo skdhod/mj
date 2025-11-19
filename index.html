@@ -3,194 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>wzlxf.space</title>
+    <title>wzlxf.space | Universe</title>
+    <meta name="theme-color" content="#050505">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- 1. 设计系统与重置 --- */
+        /* --- 1. Design Tokens (设计变量) --- */
         :root {
-            --bg-deep: #000000;
-            --text-primary: #f5f5f7;
-            --text-secondary: #86868b;
-            --gradient-aurora: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); /* 柔和暖色 */
-            --gradient-hero: linear-gradient(90deg, #2E3192 0%, #1BFFFF 100%); /* 宇宙冷色 */
-            --gradient-love: linear-gradient(to right, #ff758c 0%, #ff7eb3 100%);
-            --easing: cubic-bezier(0.165, 0.84, 0.44, 1); /* Apple 惯用的缓动曲线 */
+            --bg-void: #050505;
+            --text-primary: #F5F5F7;
+            --text-muted: rgba(245, 245, 247, 0.6);
+            --accent-glow: rgba(255, 255, 255, 0.15);
+            
+            /* 高级渐变：低饱和，高明度，珠光质感 */
+            --gradient-text-1: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 100%);
+            --gradient-text-love: linear-gradient(135deg, #FFD1DC 0%, #FF9A9E 100%);
+            
+            /* 字体定义 */
+            --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-serif: "Playfair Display", serif;
+            
+            /* 缓动 */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        html, body {
+        /* --- 2. Global Reset & Base (全局重置) --- */
+        html.lenis { height: auto; } 
+        .lenis.lenis-smooth { scroll-behavior: auto !important; } 
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; } 
+        .lenis.lenis-stopped { overflow: hidden; } 
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
+
+        body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-deep);
+            background-color: var(--bg-void);
             color: var(--text-primary);
-            /* 优先使用 Apple 系统字体，回退到高质量无衬线字体 */
-            font-family: "SF Pro Display", "SF Pro Icons", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-sans);
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased; /* iOS 字体抗锯齿 */
+            -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overscroll-behavior: none; /* 禁止橡皮筋效果，增强沉浸感 */
+            cursor: default; /* 可以在这里换成自定义光标 */
         }
 
-        /* 隐藏滚动条 */
-        ::-webkit-scrollbar { width: 0; height: 0; background: transparent; }
+        /* 噪点纹理层：增加电影胶片感 */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
 
-        /* --- 2. 背景层 --- */
+        /* --- 3. Background Canvas (背景) --- */
         #canvas-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #0b0b10 0%, #000000 100%); /* 增加一点点中心光晕 */
         }
 
-        /* --- 3. 布局结构 --- */
-        .scroll-container {
-            position: relative;
-            z-index: 1;
+        /* 增加暗角，聚焦视线 */
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 50%, #000000 120%);
+            z-index: 0;
+            pointer-events: none;
         }
 
+        /* --- 4. Layout & Typography (布局与排版) --- */
         .section {
-            height: 150vh; /* 延长滚动行程 */
+            height: 140vh; /* 给滚动留出足够的行程 */
             position: relative;
             width: 100%;
         }
 
-        /* 这里的 sticky 是实现 Apple 官网 "Scroll-jacking" 效果的关键 */
         .sticky-wrapper {
             position: sticky;
             top: 0;
             height: 100vh;
             width: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            will-change: transform, opacity; /* 性能优化提示 */
         }
 
-        /* --- 4. 排版与组件 --- */
         .content-box {
-            text-align: center;
-            padding: 0 20px;
-            max-width: 800px;
-            opacity: 0; /* 默认隐藏，JS控制 */
-            transform: translateY(40px);
-            transition: opacity 0.1s linear; /* 动画由 JS 接管，这里只做基础 */
-        }
-
-        h1 {
-            font-size: clamp(48px, 8vw, 96px); /* 响应式巨型字体 */
-            font-weight: 800;
-            letter-spacing: -0.03em; /* 紧凑字距 */
-            line-height: 1.05;
-            margin: 0 0 20px 0;
-            color: #fff;
-        }
-
-        /* 增强的渐变文字效果 */
-        .text-gradient {
-            background-image: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-        
-        .text-highlight {
-            background: linear-gradient(90deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 24px;
+            max-width: 900px;
+            /* 初始状态由 JS 控制，不再写死 CSS 动画，防止冲突 */
+            opacity: 0;
+            will-change: transform, opacity, filter;
         }
 
-        p {
-            font-size: clamp(20px, 3.5vw, 32px);
+        /* 巨型标题风格 */
+        h1 {
+            font-family: var(--font-sans);
+            font-size: clamp(3rem, 8vw, 7rem); /* 响应式字体 */
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em; /* 紧凑字距，更现代 */
+            margin: 0 0 24px 0;
+            color: white;
+        }
+
+        h1 span.serif {
+            font-family: var(--font-serif);
             font-weight: 400;
-            color: var(--text-secondary);
-            line-height: 1.4;
-            margin: 0 auto;
-            max-width: 600px;
-            letter-spacing: -0.01em;
+            font-style: italic;
+            letter-spacing: -0.02em;
+            background: var(--gradient-text-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* 提示向下箭头 */
-        .scroll-indicator {
+        /* 副标题/正文风格 */
+        p {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            font-weight: 300;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto;
+            letter-spacing: 0.02em;
+            /* 玻璃拟态文字背景，增强可读性 */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+        }
+
+        .highlight {
+            color: #fff;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 2px;
+        }
+
+        /* --- 5. Special Elements (特殊元素) --- */
+        
+        /* 滚动提示 */
+        .scroll-hint {
             position: absolute;
-            bottom: 50px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 8px;
             opacity: 0;
-            animation: fadeInOut 3s infinite var(--easing);
-        }
-        
-        .chevron {
-            width: 24px;
-            height: 4px;
-            background: #fff;
-            border-radius: 2px;
-            opacity: 0.5;
+            animation: fadeUp 2s var(--ease-out-expo) 1s forwards;
         }
 
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.2; transform: translateX(-50%) translateY(0); }
-            50% { opacity: 0.8; transform: translateX(-50%) translateY(10px); }
+        .scroll-text {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
         }
 
-        /* 心形特效 */
-        .heart-wrapper {
-            margin-top: 40px;
-            position: relative;
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--text-muted), transparent);
+        }
+
+        /* 心跳区域 */
+        .heart-container {
+            margin-top: 6vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
-        
-        .heart {
-            font-size: clamp(80px, 15vw, 150px);
-            background: var(--gradient-love);
+
+        /* 纯 CSS 绘制的光晕心形 */
+        .heart-shape {
+            font-size: clamp(80px, 12vw, 140px);
+            background: var(--gradient-text-love);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px rgba(255, 117, 140, 0.4));
-            transform: scale(0);
+            filter: drop-shadow(0 0 40px rgba(255, 117, 140, 0.3));
+            transform-origin: center center;
             will-change: transform;
         }
-
-        /* 增加一点磨砂玻璃感 */
-        .blur-layer {
+        
+        /* 心跳背后的星云光晕 */
+        .nebula-glow {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,117,140,0.15) 0%, transparent 70%);
+            border-radius: 50%;
             pointer-events: none;
-            z-index: 2;
-            /* 这里的技巧：用径向渐变做暗角，增强电影感 */
-            background: radial-gradient(circle, transparent 60%, black 120%);
+            z-index: -1;
         }
 
+        /* --- 6. Utility Animations --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* 移动端适配微调 */
+        @media (max-width: 768px) {
+            .section { height: 130vh; }
+            h1 { margin-bottom: 16px; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="noise-overlay"></div>
+    <div class="vignette"></div>
     <div id="canvas-container">
         <canvas id="starfield"></canvas>
     </div>
-    
-    <div class="blur-layer"></div>
 
     <div class="scroll-container">
+        
         <div class="section" id="s1">
             <div class="sticky-wrapper">
                 <div class="content-box" id="c1">
-                    <h1><span class="text-gradient">wzlxf</span><br>.space</h1>
-                    <p>探索未知的引力</p>
+                    <h1>wzlxf<span class="serif">.space</span></h1>
+                    <p>探索未知的引力边界</p>
                 </div>
-                <div class="scroll-indicator">
-                    <div class="chevron"></div>
+                <div class="scroll-hint">
+                    <span class="scroll-text">Scroll</span>
+                    <div class="scroll-line"></div>
                 </div>
             </div>
         </div>
@@ -198,8 +244,8 @@
         <div class="section" id="s2">
             <div class="sticky-wrapper">
                 <div class="content-box" id="c2">
-                    <h1>在 930 亿光年的<br>孤寂之中</h1>
-                    <p>星尘变换，只有光影在流转。</p>
+                    <h1>930亿光年的<br><span class="serif">孤寂</span></h1>
+                    <p>星尘变换，唯有时间是绝对的度量。</p>
                 </div>
             </div>
         </div>
@@ -207,37 +253,59 @@
         <div class="section" id="s3">
             <div class="sticky-wrapper">
                 <div class="content-box" id="c3">
-                    <h1>相遇的概率<br>微乎其微</h1>
-                    <p style="color: #fff; font-weight: 500;">But gravity brought me to you.</p>
+                    <h1>相遇的概率<br><span class="serif">趋近于零</span></h1>
+                    <p>但引力是个例外。<br><span class="highlight">Gravity brings me to you.</span></p>
                 </div>
             </div>
         </div>
 
-        <div class="section" id="s4" style="height: 130vh;"> <div class="sticky-wrapper">
+        <div class="section" id="s4" style="height: 120vh;">
+            <div class="sticky-wrapper">
                 <div class="content-box" id="c4">
-                    <h1>直到遇见<br><span class="text-highlight">楼小菲</span></h1>
-                    <div class="heart-wrapper">
-                        <div class="heart" id="heart-icon">❤</div>
+                    <h1>直到遇见<br><span class="serif" style="background: var(--gradient-text-love); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">楼小菲</span></h1>
+                    <div class="heart-container">
+                        <div class="nebula-glow"></div>
+                        <div class="heart-shape" id="heart">❤</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    
     <script>
-        // --- 核心逻辑：Apple 风格的平滑动画 ---
+        // --- 1. 初始化 Lenis 平滑滚动 ---
+        // 这一步是质感提升的关键，模拟 macOS/iOS 的阻尼感
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // iOS 风格缓动
+            smoothWheel: true,
+            touchMultiplier: 2, // 触控灵敏度
+        });
 
-        // 1. 3D 星空引擎 (增强版)
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+
+        // --- 2. 高级星空引擎 (Canvas) ---
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
         
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+        let width, height;
         let stars = [];
-        // 模拟滚动速度，用于制造"光速"效果
-        let scrollSpeed = 0;
-        let lastScrollY = window.scrollY;
+        
+        // 状态管理
+        const state = {
+            scrollSpeed: 0,
+            lastScrollY: 0,
+            targetSpeed: 0
+        };
 
+        // 调整画布尺寸
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
@@ -246,51 +314,60 @@
             initStars();
         }
 
+        // 星星类
         class Star {
             constructor() {
-                this.init();
+                this.init(true);
             }
             
-            init() {
-                this.x = (Math.random() - 0.5) * width * 2; // 宽分布
-                this.y = (Math.random() - 0.5) * height * 2;
-                this.z = Math.random() * 2000 + 500; // 深度
-                this.radius = Math.random() * 1.5;
-                this.opacity = Math.random();
+            init(isStart = false) {
+                this.x = (Math.random() - 0.5) * width * 1.5; // 宽幅分布
+                this.y = (Math.random() - 0.5) * height * 1.5;
+                this.z = isStart ? Math.random() * 2000 : 2000; // 初始随机深度，复活时在最远
+                this.baseSize = Math.random() * 1.2; // 基础大小
+                // 颜色偏移：大部分是白/蓝，极少部分偏红
+                const hue = Math.random() > 0.9 ? 340 : 220; 
+                const sat = Math.random() * 50;
+                this.color = `hsla(${hue}, ${sat}%, 80%,`;
+                this.blinkSpeed = 0.02 + Math.random() * 0.05;
+                this.blinkOffset = Math.random() * Math.PI * 2;
             }
 
-            draw(speedFactor) {
-                // 核心算法：透视投影
-                this.z -= (2 + speedFactor * 50); // 基础速度 + 滚动加速
+            draw(speed) {
+                // Z轴运动逻辑
+                this.z -= (1 + speed * 40); // 基础速度 + 滚动爆发速度
 
                 if (this.z <= 1) {
                     this.init();
-                    this.z = 3000; // 重置到远处
+                    return;
                 }
 
-                const scale = 1000 / this.z; // 焦距 1000
+                const perspective = 800; // 视距
+                const scale = perspective / this.z;
                 const x2d = width / 2 + this.x * scale;
                 const y2d = height / 2 + this.y * scale;
 
-                // 根据速度拉长星星，变成"光线"
-                const tailLength = Math.max(this.radius, speedFactor * 30); 
+                // 呼吸闪烁效果
+                const opacity = (Math.sin(Date.now() * 0.001 * this.blinkSpeed + this.blinkOffset) + 1) / 2 * 0.5 + 0.5;
                 
-                // 绘制
+                // 高速时的拉伸效果 (Motion Blur)
+                const tailLen = Math.max(0, speed * 40 * scale);
+
                 ctx.beginPath();
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity * Math.min(1, scale)})`;
+                ctx.fillStyle = this.color + opacity + ')';
                 
-                if (speedFactor > 0.5) {
-                    // 高速时画线
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                    ctx.lineWidth = this.radius * scale;
-                    ctx.moveTo(x2d, y2d);
-                    // 简单的径向模糊模拟
+                if (tailLen > 1) {
+                    // 拉伸成线
                     const angle = Math.atan2(y2d - height/2, x2d - width/2);
-                    ctx.lineTo(x2d - Math.cos(angle) * tailLength, y2d - Math.sin(angle) * tailLength);
+                    ctx.strokeStyle = this.color + (opacity * 0.8) + ')';
+                    ctx.lineWidth = this.baseSize * scale;
+                    ctx.lineCap = 'round';
+                    ctx.moveTo(x2d, y2d);
+                    ctx.lineTo(x2d - Math.cos(angle) * tailLen, y2d - Math.sin(angle) * tailLen);
                     ctx.stroke();
                 } else {
-                    // 低速时画圆
-                    ctx.arc(x2d, y2d, this.radius * scale, 0, Math.PI * 2);
+                    // 静止画圆
+                    ctx.arc(x2d, y2d, this.baseSize * scale, 0, Math.PI * 2);
                     ctx.fill();
                 }
             }
@@ -298,109 +375,127 @@
 
         function initStars() {
             stars = [];
-            for(let i = 0; i < 600; i++) stars.push(new Star());
+            const count = window.innerWidth < 768 ? 400 : 800; // 移动端减少粒子数优化性能
+            for(let i = 0; i < count; i++) stars.push(new Star());
         }
 
-        // --- 2. 滚动动画控制器 ---
-        // 使用 IntersectionObserver 和 requestAnimationFrame 结合
 
-        const contents = [
-            document.getElementById('c1'),
-            document.getElementById('c2'),
-            document.getElementById('c3'),
-            document.getElementById('c4')
-        ];
+        // --- 3. 视觉视差与过渡逻辑 (Scroll Logic) ---
+        
         const sections = [
             document.getElementById('s1'),
             document.getElementById('s2'),
             document.getElementById('s3'),
             document.getElementById('s4')
         ];
-        const heart = document.getElementById('heart-icon');
+        
+        const contents = [
+            document.getElementById('c1'),
+            document.getElementById('c2'),
+            document.getElementById('c3'),
+            document.getElementById('c4')
+        ];
+        
+        const heart = document.getElementById('heart');
+
+        // 线性插值帮助函数
+        const lerp = (start, end, t) => start * (1 - t) + end * t;
 
         function animate() {
-            const currentScrollY = window.scrollY;
-            
-            // 计算滚动速度 (绝对值)，用于星空加速
-            const delta = Math.abs(currentScrollY - lastScrollY);
-            scrollSpeed = scrollSpeed * 0.9 + delta * 0.1; // 简单的惯性平滑
-            lastScrollY = currentScrollY;
+            // 1. 计算滚动速度 (用于星空加速)
+            state.targetSpeed = (lenis.velocity || 0) / 100; // Lenis 提供的速度更精准
+            state.scrollSpeed = lerp(state.scrollSpeed, Math.abs(state.targetSpeed), 0.1);
 
-            // 1. 绘制星空
+            // 2. 绘制星空
             ctx.clearRect(0, 0, width, height);
-            // 增加一点背景渐变清除，防止重影
-            // ctx.fillStyle = 'rgba(0,0,0,0.8)';
-            // ctx.fillRect(0,0,width,height); 
-            stars.forEach(star => star.draw(Math.min(5, scrollSpeed / 10)));
-
-            // 2. 处理文字动画 (基于滚动位置的精确控制)
-            // 这种 Scrub 动画 (Scrubbing) 是 Apple 网页的精髓
+            // 叠加层，避免完全清除，产生微弱拖尾（可选）
+            // ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
+            // ctx.fillRect(0,0,width,height);
             
+            stars.forEach(star => star.draw(state.scrollSpeed));
+
+            // 3. 内容 Scrubbing 动画 (基于滚动位置)
+            const scrollY = window.scrollY;
             const winH = window.innerHeight;
 
-            // Section 1 Logic: Fade Out & Blur
-            const s1Rect = sections[0].getBoundingClientRect();
-            const p1 = Math.max(0, Math.min(1, -s1Rect.top / (winH * 0.8)));
-            if (s1Rect.bottom > 0) {
-                contents[0].style.opacity = 1 - p1;
-                contents[0].style.transform = `translateY(${p1 * -50}px) scale(${1 - p1 * 0.1})`;
-                contents[0].style.filter = `blur(${p1 * 10}px)`;
+            // 通用处理函数：计算 Section 在视口的进度
+            // 0 = 刚进入底部, 1 = 到达顶部 (对于 sticky 元素，这意味着在 sticky 期间的进度)
+            
+            // --- Section 1: 淡出模糊 ---
+            const r1 = sections[0].getBoundingClientRect();
+            // 进度计算：从 0 (顶部对齐) 到 1 (滚出视口)
+            let p1 = Math.abs(r1.top) / winH; 
+            if (r1.top <= 0 && r1.bottom > 0) {
+                contents[0].style.opacity = 1 - p1 * 1.5; // 加速淡出
+                contents[0].style.filter = `blur(${p1 * 20}px)`;
+                contents[0].style.transform = `scale(${1 - p1 * 0.2})`;
+            } else if (r1.top > 0) {
+                contents[0].style.opacity = 1;
+                contents[0].style.filter = 'blur(0px)';
+                contents[0].style.transform = 'scale(1)';
             }
 
-            // Section 2 Logic: Zoom In & Fade
-            const s2Rect = sections[1].getBoundingClientRect();
-            // 这里的算法是：当 section 进入视口中心时，进度为 0->1
-            let p2 = (winH - s2Rect.top) / winH;
-            if (p2 > 0 && p2 < 2) {
-                // 0 到 1 (入场): 淡入 + 缩小归位
-                // 1 到 2 (出场): 放大 + 淡出
-                let op = 0, tr = 0, sc = 1, bl = 0;
-                
-                if (p2 <= 1) {
-                    op = Math.pow(p2, 3); // 指数级淡入，更高级
-                    sc = 1.2 - p2 * 0.2; // 从 1.2倍 缩小到 1倍
-                    tr = (1 - p2) * 50;
-                } else {
-                    op = 1 - (p2 - 1);
-                    sc = 1 + (p2 - 1) * 0.5; // 放大离场
-                    bl = (p2 - 1) * 10;
+            // --- Section 2: 放大淡入 -> 缩小淡出 ---
+            const r2 = sections[1].getBoundingClientRect();
+            let p2 = (winH - r2.top) / winH; // 0(入) -> 1(中) -> 2(出)
+            
+            if (p2 > 0 && p2 < 2.5) {
+                let op, sc, bl;
+                // 入场阶段
+                if (p2 < 1.2) {
+                    const progress = Math.max(0, p2 - 0.2); // 稍微延迟
+                    op = Math.min(1, progress * 1.5);
+                    sc = 1.1 - progress * 0.1; // 1.1 -> 1.0
+                    bl = (1 - Math.min(1, progress * 2)) * 10;
+                } 
+                // 离场阶段
+                else {
+                    const progress = p2 - 1.2;
+                    op = Math.max(0, 1 - progress * 1.5);
+                    sc = 1.0 + progress * 0.2; // 1.0 -> 1.2
+                    bl = progress * 10;
                 }
                 contents[1].style.opacity = op;
-                contents[1].style.transform = `translateY(${tr}px) scale(${sc})`;
+                contents[1].style.transform = `scale(${sc})`;
                 contents[1].style.filter = `blur(${bl}px)`;
             }
 
-            // Section 3 Logic: Slide Up
-            const s3Rect = sections[2].getBoundingClientRect();
-            let p3 = (winH - s3Rect.top) / winH;
+            // --- Section 3: 上浮出现 ---
+            const r3 = sections[2].getBoundingClientRect();
+            let p3 = (winH - r3.top) / winH;
+            
             if (p3 > 0 && p3 < 2.5) {
-                let op = 0, tr = 0;
-                if (p3 <= 1) {
-                    op = p3;
-                    tr = 100 - p3 * 100;
+                let op, ty;
+                if (p3 < 1.3) {
+                     const progress = Math.max(0, p3 - 0.3);
+                     op = Math.min(1, progress);
+                     ty = (1 - Math.min(1, progress)) * 60; // 60px -> 0px
                 } else {
-                    op = 1 - (p3 - 1.5); // 稍微停留一下再消失
-                    tr = (p3 - 1) * -50;
+                    const progress = p3 - 1.3;
+                    op = Math.max(0, 1 - progress);
+                    ty = progress * -60;
                 }
-                contents[2].style.opacity = Math.max(0, op);
-                contents[2].style.transform = `translateY(${tr}px)`;
+                contents[2].style.opacity = op;
+                contents[2].style.transform = `translateY(${ty}px)`;
             }
 
-            // Section 4 Logic: Reveal Heart
-            const s4Rect = sections[3].getBoundingClientRect();
-            let p4 = (winH - s4Rect.top) / winH;
-            if (p4 > 0) {
-                let op = Math.min(1, (p4 - 0.2) * 2);
-                let sc = 1.5 - Math.min(0.5, (p4 - 0.2) * 0.5);
-                
-                contents[3].style.opacity = op;
-                contents[3].style.transform = `scale(${sc})`;
+            // --- Section 4: 最终章与心跳 ---
+            const r4 = sections[3].getBoundingClientRect();
+            let p4 = (winH - r4.top) / winH;
 
-                // 心跳控制
-                if (p4 > 0.8) {
-                    heart.style.transform = `scale(${1 + Math.sin(Date.now() / 150) * 0.15})`;
+            if (p4 > 0) {
+                const progress = Math.max(0, p4 - 0.2);
+                contents[3].style.opacity = Math.min(1, progress * 2);
+                
+                const scaleBase = 1;
+                // 只有在完全显示后才开始心跳
+                if (progress > 0.8) {
+                    const beat = 1 + Math.sin(Date.now() / 200) * 0.15; // 快速心跳
+                    heart.style.transform = `scale(${beat})`;
+                    heart.style.filter = `drop-shadow(0 0 ${20 + beat*20}px rgba(255, 117, 140, 0.6))`;
                 } else {
-                    heart.style.transform = `scale(0)`;
+                    const entryScale = 0.5 + Math.min(0.5, progress * 0.5);
+                    heart.style.transform = `scale(${entryScale})`;
                 }
             }
 
@@ -410,12 +505,11 @@
         // 初始化
         window.addEventListener('resize', resize);
         resize();
-        requestAnimationFrame(animate);
+        animate();
 
-        // 初始触发显示第一屏，防止空白
+        // 强制首屏显示优化
         setTimeout(() => {
             contents[0].style.opacity = 1;
-            contents[0].style.transform = 'translateY(0)';
         }, 100);
 
     </script>
