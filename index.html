@@ -2,516 +2,193 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>wzlxf.space | Universe</title>
-    <meta name="theme-color" content="#050505">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To: 小菲 (臭姐姐)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'love-bg': '#FDFBF7',
+                        'love-pink': '#ECC8C5',
+                        'love-accent': '#D4878C',
+                        'text-main': '#4A4A4A',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        hand: ['"Ma Shan Zheng"', 'cursive'],
+                        sans: ['"Nunito"', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 1.5s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        /* --- 1. Design Tokens (设计变量) --- */
-        :root {
-            --bg-void: #050505;
-            --text-primary: #F5F5F7;
-            --text-muted: rgba(245, 245, 247, 0.6);
-            --accent-glow: rgba(255, 255, 255, 0.15);
-            
-            /* 高级渐变：低饱和，高明度，珠光质感 */
-            --gradient-text-1: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 100%);
-            --gradient-text-love: linear-gradient(135deg, #FFD1DC 0%, #FF9A9E 100%);
-            
-            /* 字体定义 */
-            --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-serif: "Playfair Display", serif;
-            
-            /* 缓动 */
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        /* 自定义动画 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
         }
-
-        /* --- 2. Global Reset & Base (全局重置) --- */
-        html.lenis { height: auto; } 
-        .lenis.lenis-smooth { scroll-behavior: auto !important; } 
-        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; } 
-        .lenis.lenis-stopped { overflow: hidden; } 
-        .lenis.lenis-scrolling iframe { pointer-events: none; }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-void);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            cursor: default; /* 可以在这里换成自定义光标 */
-        }
-
-        /* 噪点纹理层：增加电影胶片感 */
-        .noise-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        /* --- 3. Background Canvas (背景) --- */
-        #canvas-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-
-        /* 增加暗角，聚焦视线 */
-        .vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, transparent 50%, #000000 120%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* --- 4. Layout & Typography (布局与排版) --- */
-        .section {
-            height: 140vh; /* 给滚动留出足够的行程 */
-            position: relative;
-            width: 100%;
-        }
-
-        .sticky-wrapper {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .content-box {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 0 24px;
-            max-width: 900px;
-            /* 初始状态由 JS 控制，不再写死 CSS 动画，防止冲突 */
-            opacity: 0;
-            will-change: transform, opacity, filter;
-        }
-
-        /* 巨型标题风格 */
-        h1 {
-            font-family: var(--font-sans);
-            font-size: clamp(3rem, 8vw, 7rem); /* 响应式字体 */
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -0.04em; /* 紧凑字距，更现代 */
-            margin: 0 0 24px 0;
-            color: white;
-        }
-
-        h1 span.serif {
-            font-family: var(--font-serif);
-            font-weight: 400;
-            font-style: italic;
-            letter-spacing: -0.02em;
-            background: var(--gradient-text-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* 副标题/正文风格 */
-        p {
-            font-size: clamp(1.1rem, 2vw, 1.5rem);
-            font-weight: 300;
-            color: var(--text-muted);
-            line-height: 1.6;
-            max-width: 500px;
-            margin: 0 auto;
-            letter-spacing: 0.02em;
-            /* 玻璃拟态文字背景，增强可读性 */
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
-        }
-
-        .highlight {
-            color: #fff;
-            font-weight: 500;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            padding-bottom: 2px;
-        }
-
-        /* --- 5. Special Elements (特殊元素) --- */
-        
-        /* 滚动提示 */
-        .scroll-hint {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            opacity: 0;
-            animation: fadeUp 2s var(--ease-out-expo) 1s forwards;
-        }
-
-        .scroll-text {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--text-muted);
-        }
-
-        .scroll-line {
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, var(--text-muted), transparent);
-        }
-
-        /* 心跳区域 */
-        .heart-container {
-            margin-top: 6vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        /* 纯 CSS 绘制的光晕心形 */
-        .heart-shape {
-            font-size: clamp(80px, 12vw, 140px);
-            background: var(--gradient-text-love);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 40px rgba(255, 117, 140, 0.3));
-            transform-origin: center center;
-            will-change: transform;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 心跳背后的星云光晕 */
-        .nebula-glow {
+        /* 玻璃拟态背景 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(236, 200, 197, 0.2);
+        }
+
+        /* 柔和的光斑背景 */
+        .blob {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,117,140,0.15) 0%, transparent 70%);
             border-radius: 50%;
-            pointer-events: none;
+            filter: blur(80px);
+            opacity: 0.6;
             z-index: -1;
         }
-
-        /* --- 6. Utility Animations --- */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translate(-50%, 20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+        
+        .love-btn {
+            transition: all 0.3s ease;
         }
-
-        /* 移动端适配微调 */
-        @media (max-width: 768px) {
-            .section { height: 130vh; }
-            h1 { margin-bottom: 16px; }
+        .love-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212, 135, 140, 0.3);
         }
     </style>
 </head>
-<body>
+<body class="bg-love-bg text-text-main font-sans min-h-screen relative overflow-x-hidden selection:bg-love-pink selection:text-white">
 
-    <div class="noise-overlay"></div>
-    <div class="vignette"></div>
-    <div id="canvas-container">
-        <canvas id="starfield"></canvas>
-    </div>
+    <div class="blob bg-pink-200 w-96 h-96 top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="blob bg-yellow-100 w-80 h-80 bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
+    <div class="blob bg-purple-100 w-64 h-64 top-1/2 right-10 opacity-40"></div>
 
-    <div class="scroll-container">
+    <nav class="w-full p-6 flex justify-between items-center max-w-6xl mx-auto">
+        <div class="text-2xl font-hand text-love-accent tracking-widest">X & Me</div>
+        <div class="px-4 py-1.5 rounded-full glass-card text-sm font-medium text-gray-500 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            收件人: 臭姐姐 🍬
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-6 pt-12 pb-20 flex flex-col items-center justify-center text-center z-10 relative">
         
-        <div class="section" id="s1">
-            <div class="sticky-wrapper">
-                <div class="content-box" id="c1">
-                    <h1>wzlxf<span class="serif">.space</span></h1>
-                    <p>探索未知的引力边界</p>
+        <div class="text-6xl mb-6 animate-float cursor-pointer hover:scale-110 transition-transform duration-300" onclick="createHeart(event)">
+            💌
+        </div>
+
+        <div class="space-y-4 animate-fade-in">
+            <p class="font-hand text-2xl text-love-accent transform -rotate-2">
+                Hey, 小菲
+            </p>
+            <h1 class="font-serif text-4xl md:text-6xl font-bold text-gray-800 leading-tight">
+                把银河揉碎<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-love-accent to-pink-400">只为写给你看</span>
+            </h1>
+            <p class="text-gray-500 mt-6 max-w-lg mx-auto text-lg font-light leading-relaxed">
+                虽然你有时候很凶，还是个“臭姐姐”，<br>
+                但也是我心尖上最柔软的那个小朋友。
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-12 w-full max-w-3xl opacity-0" style="animation: fadeIn 1.5s ease-out 0.5s forwards;">
+            
+            <div class="glass-card rounded-3xl p-8 hover:bg-white/60 transition-colors duration-500">
+                <div class="flex justify-between items-start mb-4">
+                    <i class="fa-regular fa-clock text-2xl text-love-accent"></i>
+                    <span class="text-xs uppercase tracking-widest text-gray-400">Love Timer</span>
                 </div>
-                <div class="scroll-hint">
-                    <span class="scroll-text">Scroll</span>
-                    <div class="scroll-line"></div>
+                <div class="text-left">
+                    <p class="text-sm text-gray-500 mb-1">我们已经相遇</p>
+                    <h3 class="text-3xl font-serif font-bold text-gray-700">365 <span class="text-base font-normal">Days</span></h3>
+                    <p class="text-xs text-love-accent mt-2 italic">每一秒都值得收藏</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 hover:bg-white/60 transition-colors duration-500 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-pink-100 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-150"></div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <i class="fa-solid fa-quote-left text-2xl text-love-accent"></i>
+                    <span class="text-xs uppercase tracking-widest text-gray-400">To You</span>
+                </div>
+                <div class="text-left relative z-10">
+                    <p class="font-serif text-lg text-gray-700 italic leading-relaxed">
+                        "你是我的私有浪漫，也是我平淡生活里的刺眼星光。"
+                    </p>
+                    <p class="text-xs text-right mt-4 text-gray-400">- 爱你的臭弟弟</p>
                 </div>
             </div>
         </div>
 
-        <div class="section" id="s2">
-            <div class="sticky-wrapper">
-                <div class="content-box" id="c2">
-                    <h1>930亿光年的<br><span class="serif">孤寂</span></h1>
-                    <p>星尘变换，唯有时间是绝对的度量。</p>
-                </div>
-            </div>
+        <div class="mt-16 flex flex-col md:flex-row gap-4 opacity-0" style="animation: fadeIn 1.5s ease-out 0.8s forwards;">
+            <button class="love-btn bg-gradient-to-r from-love-accent to-pink-400 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-pink-200/50 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-envelope"></i>
+                查看告白信
+            </button>
+            <button class="love-btn glass-card px-10 py-4 rounded-full font-bold text-gray-600 hover:text-love-accent flex items-center justify-center gap-2">
+                <i class="fa-solid fa-ticket"></i>
+                兑换贴贴券
+            </button>
         </div>
 
-        <div class="section" id="s3">
-            <div class="sticky-wrapper">
-                <div class="content-box" id="c3">
-                    <h1>相遇的概率<br><span class="serif">趋近于零</span></h1>
-                    <p>但引力是个例外。<br><span class="highlight">Gravity brings me to you.</span></p>
-                </div>
-            </div>
-        </div>
+    </main>
 
-        <div class="section" id="s4" style="height: 120vh;">
-            <div class="sticky-wrapper">
-                <div class="content-box" id="c4">
-                    <h1>直到遇见<br><span class="serif" style="background: var(--gradient-text-love); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">楼小菲</span></h1>
-                    <div class="heart-container">
-                        <div class="nebula-glow"></div>
-                        <div class="heart-shape" id="heart">❤</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <footer class="absolute bottom-4 w-full text-center text-xs text-gray-400 font-light">
+        Made with <i class="fa-solid fa-heart text-red-400 mx-1 animate-pulse"></i> for Xiao Fei
+    </footer>
 
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-    
     <script>
-        // --- 1. 初始化 Lenis 平滑滚动 ---
-        // 这一步是质感提升的关键，模拟 macOS/iOS 的阻尼感
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // iOS 风格缓动
-            smoothWheel: true,
-            touchMultiplier: 2, // 触控灵敏度
+        function createHeart(event) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤';
+            heart.style.position = 'fixed';
+            heart.style.left = (event.clientX) + 'px';
+            heart.style.top = (event.clientY) + 'px';
+            heart.style.color = '#D4878C';
+            heart.style.fontSize = '24px';
+            heart.style.pointerEvents = 'none';
+            heart.style.transform = 'translate(-50%, -50%)';
+            heart.style.animation = 'floatUp 1s ease-out forwards';
+            
+            document.body.appendChild(heart);
+
+            // 动态添加keyframe
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes floatUp {
+                    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                heart.remove();
+                style.remove();
+            }, 1000);
+        }
+
+        // 全局点击效果
+        document.addEventListener('click', function(e) {
+            if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                createHeart(e);
+            }
         });
-
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
-
-
-        // --- 2. 高级星空引擎 (Canvas) ---
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let stars = [];
-        
-        // 状态管理
-        const state = {
-            scrollSpeed: 0,
-            lastScrollY: 0,
-            targetSpeed: 0
-        };
-
-        // 调整画布尺寸
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            initStars();
-        }
-
-        // 星星类
-        class Star {
-            constructor() {
-                this.init(true);
-            }
-            
-            init(isStart = false) {
-                this.x = (Math.random() - 0.5) * width * 1.5; // 宽幅分布
-                this.y = (Math.random() - 0.5) * height * 1.5;
-                this.z = isStart ? Math.random() * 2000 : 2000; // 初始随机深度，复活时在最远
-                this.baseSize = Math.random() * 1.2; // 基础大小
-                // 颜色偏移：大部分是白/蓝，极少部分偏红
-                const hue = Math.random() > 0.9 ? 340 : 220; 
-                const sat = Math.random() * 50;
-                this.color = `hsla(${hue}, ${sat}%, 80%,`;
-                this.blinkSpeed = 0.02 + Math.random() * 0.05;
-                this.blinkOffset = Math.random() * Math.PI * 2;
-            }
-
-            draw(speed) {
-                // Z轴运动逻辑
-                this.z -= (1 + speed * 40); // 基础速度 + 滚动爆发速度
-
-                if (this.z <= 1) {
-                    this.init();
-                    return;
-                }
-
-                const perspective = 800; // 视距
-                const scale = perspective / this.z;
-                const x2d = width / 2 + this.x * scale;
-                const y2d = height / 2 + this.y * scale;
-
-                // 呼吸闪烁效果
-                const opacity = (Math.sin(Date.now() * 0.001 * this.blinkSpeed + this.blinkOffset) + 1) / 2 * 0.5 + 0.5;
-                
-                // 高速时的拉伸效果 (Motion Blur)
-                const tailLen = Math.max(0, speed * 40 * scale);
-
-                ctx.beginPath();
-                ctx.fillStyle = this.color + opacity + ')';
-                
-                if (tailLen > 1) {
-                    // 拉伸成线
-                    const angle = Math.atan2(y2d - height/2, x2d - width/2);
-                    ctx.strokeStyle = this.color + (opacity * 0.8) + ')';
-                    ctx.lineWidth = this.baseSize * scale;
-                    ctx.lineCap = 'round';
-                    ctx.moveTo(x2d, y2d);
-                    ctx.lineTo(x2d - Math.cos(angle) * tailLen, y2d - Math.sin(angle) * tailLen);
-                    ctx.stroke();
-                } else {
-                    // 静止画圆
-                    ctx.arc(x2d, y2d, this.baseSize * scale, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-        }
-
-        function initStars() {
-            stars = [];
-            const count = window.innerWidth < 768 ? 400 : 800; // 移动端减少粒子数优化性能
-            for(let i = 0; i < count; i++) stars.push(new Star());
-        }
-
-
-        // --- 3. 视觉视差与过渡逻辑 (Scroll Logic) ---
-        
-        const sections = [
-            document.getElementById('s1'),
-            document.getElementById('s2'),
-            document.getElementById('s3'),
-            document.getElementById('s4')
-        ];
-        
-        const contents = [
-            document.getElementById('c1'),
-            document.getElementById('c2'),
-            document.getElementById('c3'),
-            document.getElementById('c4')
-        ];
-        
-        const heart = document.getElementById('heart');
-
-        // 线性插值帮助函数
-        const lerp = (start, end, t) => start * (1 - t) + end * t;
-
-        function animate() {
-            // 1. 计算滚动速度 (用于星空加速)
-            state.targetSpeed = (lenis.velocity || 0) / 100; // Lenis 提供的速度更精准
-            state.scrollSpeed = lerp(state.scrollSpeed, Math.abs(state.targetSpeed), 0.1);
-
-            // 2. 绘制星空
-            ctx.clearRect(0, 0, width, height);
-            // 叠加层，避免完全清除，产生微弱拖尾（可选）
-            // ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
-            // ctx.fillRect(0,0,width,height);
-            
-            stars.forEach(star => star.draw(state.scrollSpeed));
-
-            // 3. 内容 Scrubbing 动画 (基于滚动位置)
-            const scrollY = window.scrollY;
-            const winH = window.innerHeight;
-
-            // 通用处理函数：计算 Section 在视口的进度
-            // 0 = 刚进入底部, 1 = 到达顶部 (对于 sticky 元素，这意味着在 sticky 期间的进度)
-            
-            // --- Section 1: 淡出模糊 ---
-            const r1 = sections[0].getBoundingClientRect();
-            // 进度计算：从 0 (顶部对齐) 到 1 (滚出视口)
-            let p1 = Math.abs(r1.top) / winH; 
-            if (r1.top <= 0 && r1.bottom > 0) {
-                contents[0].style.opacity = 1 - p1 * 1.5; // 加速淡出
-                contents[0].style.filter = `blur(${p1 * 20}px)`;
-                contents[0].style.transform = `scale(${1 - p1 * 0.2})`;
-            } else if (r1.top > 0) {
-                contents[0].style.opacity = 1;
-                contents[0].style.filter = 'blur(0px)';
-                contents[0].style.transform = 'scale(1)';
-            }
-
-            // --- Section 2: 放大淡入 -> 缩小淡出 ---
-            const r2 = sections[1].getBoundingClientRect();
-            let p2 = (winH - r2.top) / winH; // 0(入) -> 1(中) -> 2(出)
-            
-            if (p2 > 0 && p2 < 2.5) {
-                let op, sc, bl;
-                // 入场阶段
-                if (p2 < 1.2) {
-                    const progress = Math.max(0, p2 - 0.2); // 稍微延迟
-                    op = Math.min(1, progress * 1.5);
-                    sc = 1.1 - progress * 0.1; // 1.1 -> 1.0
-                    bl = (1 - Math.min(1, progress * 2)) * 10;
-                } 
-                // 离场阶段
-                else {
-                    const progress = p2 - 1.2;
-                    op = Math.max(0, 1 - progress * 1.5);
-                    sc = 1.0 + progress * 0.2; // 1.0 -> 1.2
-                    bl = progress * 10;
-                }
-                contents[1].style.opacity = op;
-                contents[1].style.transform = `scale(${sc})`;
-                contents[1].style.filter = `blur(${bl}px)`;
-            }
-
-            // --- Section 3: 上浮出现 ---
-            const r3 = sections[2].getBoundingClientRect();
-            let p3 = (winH - r3.top) / winH;
-            
-            if (p3 > 0 && p3 < 2.5) {
-                let op, ty;
-                if (p3 < 1.3) {
-                     const progress = Math.max(0, p3 - 0.3);
-                     op = Math.min(1, progress);
-                     ty = (1 - Math.min(1, progress)) * 60; // 60px -> 0px
-                } else {
-                    const progress = p3 - 1.3;
-                    op = Math.max(0, 1 - progress);
-                    ty = progress * -60;
-                }
-                contents[2].style.opacity = op;
-                contents[2].style.transform = `translateY(${ty}px)`;
-            }
-
-            // --- Section 4: 最终章与心跳 ---
-            const r4 = sections[3].getBoundingClientRect();
-            let p4 = (winH - r4.top) / winH;
-
-            if (p4 > 0) {
-                const progress = Math.max(0, p4 - 0.2);
-                contents[3].style.opacity = Math.min(1, progress * 2);
-                
-                const scaleBase = 1;
-                // 只有在完全显示后才开始心跳
-                if (progress > 0.8) {
-                    const beat = 1 + Math.sin(Date.now() / 200) * 0.15; // 快速心跳
-                    heart.style.transform = `scale(${beat})`;
-                    heart.style.filter = `drop-shadow(0 0 ${20 + beat*20}px rgba(255, 117, 140, 0.6))`;
-                } else {
-                    const entryScale = 0.5 + Math.min(0.5, progress * 0.5);
-                    heart.style.transform = `scale(${entryScale})`;
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        // 初始化
-        window.addEventListener('resize', resize);
-        resize();
-        animate();
-
-        // 强制首屏显示优化
-        setTimeout(() => {
-            contents[0].style.opacity = 1;
-        }, 100);
-
     </script>
 </body>
 </html>
