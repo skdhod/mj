@@ -3,30 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
+    <title>致楼小菲 ✨</title>
     <style>
-        body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            text-align: center;
-            background-color: #f0f2f5;
-            padding-top: 100px;
+        /* 1. 页面整体布局与动态背景 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite; /* 背景缓慢流动 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
         }
-        .container {
-            background: white;
+
+        /* 背景流动的动画定义 */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 2. 玻璃磨砂质感的卡片 */
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px); /* 磨砂玻璃效果 */
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+            max-width: 80%;
+            width: 400px;
+            transition: transform 0.3s ease;
         }
-        h1 { color: #333; }
-        p { color: #666; font-size: 18px; }
+
+        .card:hover {
+            transform: translateY(-5px); /* 鼠标悬停微微上浮 */
+        }
+
+        /* 3. 跳动的爱心 */
+        .heart {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: heartbeat 1.2s infinite;
+            display: inline-block;
+            color: #ffdde1;
+            text-shadow: 0 0 10px #ff9a9e;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            40% { transform: scale(1); }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* 4. 文字样式 */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        #typewriter {
+            font-size: 18px;
+            line-height: 1.6;
+            min-height: 60px; /* 防止文字打字时高度跳动 */
+            opacity: 0.9;
+        }
+
+        /* 光标闪烁效果 */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            background-color: white;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👋 你好，世界！</h1>
-        <p>这是 wzlxf 的个人网站。</p>
-        <p>我成功把它发布到了 GitHub 上！🚀</p>
+
+    <div class="card">
+        <div class="heart">❤️</div>
+        
+        <h1>To: 楼小菲</h1>
+        
+        <div id="typewriter"></div>
+        
+        <footer>From: wzlxf.space</footer>
     </div>
+
+    <script>
+        // 这里是可以修改的情话
+        const text = "在这个广阔的宇宙里，\n w（我）z（只）l（恋）x（小）f（菲）。\n\n 愿我们的故事，\n 像星星一样永远闪耀。✨";
+
+        const typewriterElement = document.getElementById('typewriter');
+        let index = 0;
+
+        function typeWriter() {
+            if (index < text.length) {
+                const char = text.charAt(index);
+                
+                // 处理换行符
+                if (char === '\n') {
+                    typewriterElement.innerHTML += '<br>';
+                } else {
+                    typewriterElement.innerHTML += char;
+                }
+                
+                index++;
+                setTimeout(typeWriter, 150); // 打字速度，数字越大越慢
+            } else {
+                // 打字结束后添加闪烁光标
+                typewriterElement.innerHTML += '<span class="cursor">|</span>';
+            }
+        }
+
+        // 页面加载完成后开始打字
+        window.onload = typeWriter;
+    </script>
+
 </body>
 </html>
