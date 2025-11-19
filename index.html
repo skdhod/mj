@@ -2,178 +2,328 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>wzlxf.space</title>
     <style>
-        /* --- Apple 风格核心样式 --- */
+        /* --- 基础设置 --- */
         :root {
             --bg-color: #000000;
-            --text-color: #f5f5f7;
-            --accent-color: #8E2DE2; /* 紫色渐变 */
-            --accent-color-2: #4A00E0;
+            --text-primary: #ffffff;
+            --text-secondary: #86868b;
+            --accent-color: #2997ff; /* Apple Blue */
         }
 
         body, html {
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-primary);
+            font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            /* 隐藏滚动条但保留滚动 */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        body::-webkit-scrollbar { 
+            display: none; 
         }
 
-        /* 隐藏滚动条但保留滚动功能 */
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
+        /* --- 动态星空背景 (Canvas) --- */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* 放在最底层 */
+            pointer-events: none;
         }
 
-        /* 每一屏的高度设置 */
-        section {
-            min-height: 100vh;
+        /* --- 滚动容器结构 --- */
+        /* 每一个 Section 都是一个高度很长的容器，用来产生滚动距离 */
+        .scroll-section {
+            height: 150vh; /* 拉长高度，让动画有时间播放 */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /*以此控制sticky的起始位置*/
+        }
+
+        /* 这里的 Sticky 是核心，内容会钉在窗口中间 */
+        .sticky-content {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            opacity: 0; /* 初始隐藏 */
-            transform: translateY(50px); /* 初始下沉 */
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); /* 苹果风格的丝滑回弹 */
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* 激活状态：当元素进入视野时 */
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* 巨大的标题文字 */
-        h1 {
-            font-size: clamp(3rem, 8vw, 6rem); /* 响应式超大字体 */
-            font-weight: 700;
-            letter-spacing: -0.02em;
             text-align: center;
+            overflow: hidden;
+            perspective: 1000px; /* 开启3D透视 */
+        }
+
+        /* --- 文本排版 --- */
+        h1 {
+            font-size: clamp(40px, 8vw, 80px);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
             margin: 0;
-            background: linear-gradient(135deg, #fff 30%, #a5a5a5);
+            opacity: 0; /* 初始隐藏，由JS控制 */
+            transform: translateY(30px);
+            background: linear-gradient(180deg, #fff, #b0b0b0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.1;
         }
 
-        /* 副标题/正文 */
         p {
-            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-size: clamp(18px, 4vw, 28px);
+            color: var(--text-secondary);
             font-weight: 400;
-            color: #86868b; /* 苹果经典的灰色副文本 */
-            text-align: center;
-            max-width: 800px;
             margin-top: 20px;
+            max-width: 80%;
+            opacity: 0;
             line-height: 1.5;
         }
 
-        /* 特殊高亮文字（渐变色） */
-        .highlight {
-            background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        /* 特殊的高亮文字 */
+        .gradient-text {
+            background: linear-gradient(90deg, #eb92be, #ffef78, #63c9b4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: 700;
         }
 
-        /* 最后一个星球/圆圈动画 */
-        .planet-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin-top: 50px;
-        }
-        
-        .planet {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-2));
-            box-shadow: 0 0 60px rgba(74, 0, 224, 0.5);
-            animation: pulse 3s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
-        /* 向下箭头提示 */
-        .scroll-indicator {
+        /* --- 视觉组件 --- */
+        .scroll-hint {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            opacity: 0.5;
-            animation: bounce 2s infinite;
+            color: #666;
+            font-size: 12px;
+            animation: fadeUpDown 2s infinite;
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
-            40% {transform: translateX(-50%) translateY(-10px);}
-            60% {transform: translateX(-50%) translateY(-5px);}
+        @keyframes fadeUpDown {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, 0); }
+            50% { opacity: 1; transform: translate(-50%, 5px); }
+        }
+
+        .heart-container {
+            font-size: 100px;
+            margin-top: 30px;
+            opacity: 0;
+            transform: scale(0.5);
+            filter: drop-shadow(0 0 30px rgba(235, 77, 75, 0.6));
         }
 
     </style>
 </head>
 <body>
 
-    <section class="visible">
-        <h1>wzlxf<br>.space</h1>
-        <p>一个只属于我们的空间。</p>
-        <div class="scroll-indicator">↓</div>
-    </section>
+    <canvas id="starfield"></canvas>
 
-    <section>
-        <h1>浩瀚宇宙</h1>
-        <p>在这无垠的星河与漫长的时间里。</p>
-    </section>
-
-    <section>
-        <h1>Probability.</h1>
-        <p>原本两条平行的轨迹，<br>相遇的概率是 <span style="color:white">0.000000003%</span>。</p>
-    </section>
-
-    <section>
-        <h1>But I found you.</h1>
-        <p>但我找到了你，<br><span class="highlight">楼小菲</span>。</p>
-    </section>
-
-    <section>
-        <div class="planet-container">
-            <div class="planet"></div>
+    <div class="scroll-section" id="section1">
+        <div class="sticky-content">
+            <h1 id="text1">wzlxf<br>.space</h1>
+            <p id="sub1">向下滑动</p>
+            <div class="scroll-hint">Scroll Down</div>
         </div>
-        <h1 style="margin-top: 30px; font-size: 2rem;">唯愿此刻永恒</h1>
-        <p style="font-size: 1rem; margin-top: 10px;">wzlxf.space</p>
-    </section>
+    </div>
+
+    <div class="scroll-section" id="section2">
+        <div class="sticky-content">
+            <h1 id="text2">在 930 亿光年的<br>宇宙之中</h1>
+            <p id="sub2">星尘变换，光影流转</p>
+        </div>
+    </div>
+
+    <div class="scroll-section" id="section3">
+        <div class="sticky-content">
+            <h1 id="text3">相遇的概率<br>微乎其微</h1>
+            <p id="sub3">But gravity brought me to you.</p>
+        </div>
+    </div>
+
+    <div class="scroll-section" id="section4" style="height: 120vh;">
+        <div class="sticky-content">
+            <h1 id="text4">直到遇见<br><span class="gradient-text">楼小菲</span></h1>
+            <div class="heart-container" id="heart">❤️</div>
+        </div>
+    </div>
 
     <script>
-        // 简单的滚动监听脚本
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1 // 当元素出现 10% 时触发
-        };
+        // --- 1. 动态星空背景逻辑 ---
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
 
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                } else {
-                    // 如果想要滚回去时消失（重复动画），把下面这行注释取消掉
-                    // entry.target.classList.remove('visible');
-                }
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = (Math.random() - 0.5) * width * 2;
+                this.y = (Math.random() - 0.5) * height * 2;
+                this.z = Math.random() * width;
+                this.pz = this.z; // previous z
+            }
+            update() {
+                this.z -= 2; // 速度
+                if (this.z <= 0) this.reset();
+            }
+            draw() {
+                const x = (this.x / this.z) * width + width / 2;
+                const y = (this.y / this.z) * height + height / 2;
+                const size = (1 - this.z / width) * 3; // 距离越近越大
+                
+                const px = (this.x / this.pz) * width + width / 2;
+                const py = (this.y / this.pz) * height + height / 2;
+
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - this.z/width})`;
+                ctx.lineWidth = size;
+                ctx.moveTo(px, py);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                this.pz = this.z;
+            }
+        }
+
+        // 初始化星星
+        for(let i=0; i<400; i++) stars.push(new Star());
+
+        function animateStars() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
             });
-        }, observerOptions);
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
 
-        document.querySelectorAll('section').forEach(section => {
-            observer.observe(section);
+
+        // --- 2. Apple 风格滚动动画逻辑 (核心) ---
+        // 这种逻辑让动画与滚动条 1:1 绑定
+        
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+
+            // --- 处理 Section 1: wzlxf.space ---
+            // 效果：随着下滑，文字放大并逐渐模糊消失
+            const s1 = document.getElementById('section1');
+            const t1 = document.getElementById('text1');
+            const sub1 = document.getElementById('sub1');
+            
+            // 计算第一屏的进度 (0 到 1)
+            let progress1 = Math.max(0, Math.min(1, scrollY / (windowHeight * 0.8)));
+            
+            // 应用样式：文字随滚动放大(scale)，透明度(opacity)降低，模糊度(blur)增加
+            t1.style.transform = `scale(${1 + progress1 * 1.5})`;
+            t1.style.opacity = `${1 - progress1}`;
+            t1.style.filter = `blur(${progress1 * 20}px)`;
+            sub1.style.opacity = `${1 - progress1 * 1.5}`;
+            
+            // 初始状态修正 (防止刷新时闪烁)
+            if(scrollY === 0) { t1.style.opacity = 1; t1.style.filter = 'blur(0px)'; }
+
+
+            // --- 处理 Section 2: 宇宙 ---
+            // 效果：从下方浮现，清晰，然后上划消失
+            const s2 = document.getElementById('section2');
+            const t2 = document.getElementById('text2');
+            const rect2 = s2.getBoundingClientRect();
+            
+            // 计算元素距离视口中心的距离
+            let progress2 = (windowHeight - rect2.top) / windowHeight;
+            
+            if (progress2 > 0 && progress2 < 2) {
+                // 进入阶段：0 -> 1 (淡入 + 上浮)
+                // 离开阶段：1 -> 2 (放大 + 淡出)
+                let opacity = 0;
+                let blur = 10;
+                let scale = 0.8;
+                
+                if (progress2 < 0.8) { // 进入
+                    opacity = progress2 / 0.8;
+                    blur = 10 - (progress2 / 0.8) * 10;
+                    scale = 0.8 + (progress2 / 0.8) * 0.2;
+                } else { // 离开
+                    opacity = 1 - (progress2 - 0.8);
+                    blur = (progress2 - 0.8) * 20;
+                    scale = 1 + (progress2 - 0.8) * 0.5;
+                }
+                t2.style.opacity = Math.max(0, opacity);
+                t2.style.filter = `blur(${Math.max(0, blur)}px)`;
+                t2.style.transform = `scale(${scale})`;
+            }
+
+
+            // --- 处理 Section 3: 概率 ---
+            const s3 = document.getElementById('section3');
+            const t3 = document.getElementById('text3');
+            const sub3 = document.getElementById('sub3');
+            const rect3 = s3.getBoundingClientRect();
+            let progress3 = (windowHeight - rect3.top) / windowHeight;
+
+            if (progress3 > 0) {
+                let opacity = Math.min(1, (progress3 - 0.2) * 2);
+                let yPos = 50 - Math.min(50, (progress3 - 0.2) * 50);
+                
+                t3.style.opacity = opacity;
+                t3.style.transform = `translateY(${yPos}px)`;
+                
+                sub3.style.opacity = Math.max(0, opacity - 0.3);
+                sub3.style.transform = `translateY(${yPos}px)`;
+            }
+
+
+            // --- 处理 Section 4: 楼小菲 ---
+            const s4 = document.getElementById('section4');
+            const t4 = document.getElementById('text4');
+            const heart = document.getElementById('heart');
+            const rect4 = s4.getBoundingClientRect();
+            let progress4 = (windowHeight - rect4.top) / windowHeight;
+
+            if (progress4 > 0.2) {
+                let p = Math.min(1, (progress4 - 0.2) * 1.5); // 归一化进度
+                
+                // 文字效果：从巨大的模糊状态聚集变清晰
+                let scale = 2 - p; 
+                let blur = 20 - p * 20;
+                
+                t4.style.opacity = p;
+                t4.style.transform = `scale(${Math.max(1, scale)})`;
+                t4.style.filter = `blur(${Math.max(0, blur)}px)`;
+                
+                // 爱心效果：最后出现，带有跳动
+                if (p > 0.8) {
+                    heart.style.opacity = (p - 0.8) * 5;
+                    heart.style.transform = `scale(${1 + Math.sin(Date.now()/200)*0.1})`; // 简单的JS跳动模拟
+                }
+            }
         });
+        
+        // 触发一次滚动以初始化
+        window.dispatchEvent(new Event('scroll'));
+
     </script>
 </body>
 </html>
