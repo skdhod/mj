@@ -2,388 +2,448 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To: 小菲 (臭姐姐)</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'love-bg': '#FDFBF7',   // 奶油白背景
-                        'love-pink': '#ECC8C5', // 灰粉色
-                        'love-accent': '#D4878C', // 强调色
-                        'text-main': '#4A4A4A', // 主要文字色
-                    },
-                    fontFamily: {
-                        serif: ['"Noto Serif SC"', 'serif'],
-                        hand: ['"Ma Shan Zheng"', 'cursive'],
-                        sans: ['"Nunito"', 'sans-serif'],
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in': 'fadeIn 1.5s ease-out forwards',
-                    }
-                }
-            }
-        }
-    </script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小菲姐姐，生日快乐！</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* === 自定义动画与样式 === */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* 玻璃拟态卡片效果 */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 32px 0 rgba(236, 200, 197, 0.2);
+        :root {
+            --primary-color: #ff758c;
+            --accent-color: #ff7eb3;
+            --text-main: #4a4a4a;
+            --text-highlight: #d93d5e;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
         }
 
-        /* 背景光斑 */
-        .blob {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: #0f0c29; /* Fallback */
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 动态背景 Canvas */
+        #bg-canvas {
             position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            z-index: -1;
-        }
-        
-        /* 按钮悬浮动效 */
-        .love-btn {
-            transition: all 0.3s ease;
-        }
-        .love-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(212, 135, 140, 0.3);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
 
-        /* 自定义滚动条 (用于信件) */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        /* 3D 容器 */
+        .container {
+            perspective: 1000px;
+            z-index: 10;
+            width: 90%;
+            max-width: 520px;
+            padding: 20px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 4px;
+
+        /* 毛玻璃卡片 */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 20px 50px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.2) inset;
+            padding: 40px;
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 0.1s ease-out;
+            opacity: 0;
+            animation: cardEntrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #ECC8C5; 
-            border-radius: 4px;
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #D4878C; 
+
+        /* 标题设计 */
+        h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            color: var(--text-highlight);
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* 正文区域 */
+        .content {
+            color: var(--text-main);
+            font-size: 1.1rem;
+            line-height: 1.9;
+            text-align: justify;
+        }
+
+        /* 逐行显示的容器 */
+        .text-line {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.6s ease;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .text-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .highlight {
+            color: var(--text-highlight);
+            font-weight: 700;
+            background: linear-gradient(to bottom, transparent 60%, rgba(255, 117, 140, 0.2) 60%);
+            padding: 0 4px;
+        }
+
+        /* 底部签名 */
+        .footer {
+            margin-top: 40px;
+            text-align: right;
+            font-size: 1rem;
+            color: var(--text-highlight);
+            font-weight: bold;
+            font-family: 'Ma Shan Zheng', cursive;
+            opacity: 0; /* 初始隐藏 */
+        }
+
+        /* 高级按钮 */
+        .btn-container {
+            margin-top: 35px;
+            display: flex;
+            justify-content: center;
+            opacity: 0; /* 初始隐藏 */
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            border: none;
+            padding: 14px 40px;
+            color: white;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 117, 140, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 117, 140, 0.6);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        /* 自定义模态框 (替代 Alert) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 80%;
+            width: 300px;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal h3 {
+            color: var(--text-highlight);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .modal p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .modal-btn {
+            background: var(--text-highlight);
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .card { padding: 25px 20px; }
+            h1 { font-size: 1.8rem; }
+            .content { font-size: 1rem; }
         }
     </style>
 </head>
-<body class="bg-love-bg text-text-main font-sans min-h-screen relative overflow-x-hidden selection:bg-love-pink selection:text-white">
+<body>
 
-    <div class="blob bg-pink-200 w-96 h-96 top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="blob bg-yellow-100 w-80 h-80 bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
-    <div class="blob bg-purple-100 w-64 h-64 top-1/2 right-10 opacity-40"></div>
+    <canvas id="bg-canvas"></canvas>
 
-    <nav class="w-full p-6 flex justify-between items-center max-w-6xl mx-auto relative z-20">
-        <div class="text-2xl font-hand text-love-accent tracking-widest">X & Me</div>
-        <div class="px-4 py-1.5 rounded-full glass-card text-sm font-medium text-gray-500 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-            收件人: 臭姐姐 🍬
-        </div>
-    </nav>
-
-    <main class="container mx-auto px-6 pt-8 pb-20 flex flex-col items-center justify-center text-center z-10 relative">
-        
-        <div class="text-6xl mb-6 animate-float cursor-pointer hover:scale-110 transition-transform duration-300" onclick="createHeart(event)">
-            💌
-        </div>
-
-        <div class="space-y-4 animate-fade-in">
-            <p class="font-hand text-2xl text-love-accent transform -rotate-2">
-                Hey, 小菲
-            </p>
-            <h1 class="font-serif text-4xl md:text-6xl font-bold text-gray-800 leading-tight">
-                把银河揉碎<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-love-accent to-pink-400">只为写给你看</span>
-            </h1>
-            <p class="text-gray-500 mt-6 max-w-lg mx-auto text-lg font-light leading-relaxed">
-                虽然你有时候很凶，还是个“臭姐姐”，<br>
-                但也是我心尖上最柔软的那个<b>宝贝</b>。
-            </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-6 mt-12 w-full max-w-3xl opacity-0" style="animation: fadeIn 1.5s ease-out 0.5s forwards;">
+    <div class="container" id="cardContainer">
+        <div class="card" id="mainCard">
+            <h1>To: 亲爱的小菲姐姐 🎂</h1>
             
-            <div class="glass-card rounded-3xl p-8 hover:bg-white/60 transition-colors duration-500">
-                <div class="flex justify-between items-start mb-4">
-                    <i class="fa-regular fa-clock text-2xl text-love-accent"></i>
-                    <span class="text-xs uppercase tracking-widest text-gray-400">Love Timer</span>
-                </div>
-                <div class="text-left">
-                    <p class="text-sm text-gray-500 mb-1">我们已经相遇</p>
-                    <h3 class="text-3xl font-serif font-bold text-gray-700">53 <span class="text-base font-normal">Days</span></h3>
-                    <p class="text-xs text-love-accent mt-2 italic">每一秒都值得收藏</p>
-                </div>
+            <div class="content" id="textContent">
+                <p>见字如面，<b>生日快乐！</b></p>
+                <p>姐姐终于十八岁啦！既然你成年了，那我可要开始“肆无忌惮”喽。新的一岁，任务只有一个：<span class="highlight">保持快乐</span>。不许太忙，更不许把自己累坏，不然我可是会打屁股的。</p>
+                <p>不知不觉，我们竟然已经认识了 <span class="highlight">98</span> 天。真的很幸运能有你这么好的姐姐，一直愿意陪我着我。</p>
+                <p>关于未来，我其实想得很清楚。虽然知道最后能走到一起的概率或许不高，但我一点都不担心。只要现在能和姐姐聊聊天、逗姐姐笑、做一些真的能帮到姐姐的事情我就已经超级满足了。</p>
+                <p>所以，好姐姐，请不要拒绝我对你的好，更不要觉得亏欠！因为我真的一点不觉得委屈嘿嘿。姐姐，我真的真的<span class="highlight">超级喜欢你！</span></p>
+                <p>最后，在新的一岁里，姐姐要健健康康的，不许熬夜，更不许天天光腿。而且姐姐要做好心里准备哦，以后我可不会是以前那样乖乖的小狗咯嘿嘿嘿。</p>
             </div>
 
-            <div class="glass-card rounded-3xl p-8 hover:bg-white/60 transition-colors duration-500 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-16 h-16 bg-pink-100 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-150"></div>
-                <div class="flex justify-between items-start mb-4 relative z-10">
-                    <i class="fa-solid fa-quote-left text-2xl text-love-accent"></i>
-                    <span class="text-xs uppercase tracking-widest text-gray-400">To You</span>
-                </div>
-                <div class="text-left relative z-10">
-                    <p class="font-serif text-lg text-gray-700 italic leading-relaxed">
-                        "你是我的私有浪漫，也是我平淡生活里的刺眼星光。"
-                    </p>
-                    <p class="text-xs text-right mt-4 text-gray-400">- 爱你的臭弟弟</p>
-                </div>
+            <div class="footer" id="footer">
+                爱你的小狗——吴泽<br>
+                <span style="font-size: 0.8em; color: #888;">2026.01.03</span>
             </div>
-        </div>
 
-        <div class="mt-16 flex flex-col md:flex-row gap-4 opacity-0" style="animation: fadeIn 1.5s ease-out 0.8s forwards;">
-            <button onclick="openModal('letter-modal')" class="love-btn bg-gradient-to-r from-love-accent to-pink-400 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-pink-200/50 flex items-center justify-center gap-2">
-                <i class="fa-regular fa-envelope"></i>
-                查看告白信
-            </button>
-            <button onclick="openModal('coupon-modal')" class="love-btn glass-card px-10 py-4 rounded-full font-bold text-gray-600 hover:text-love-accent flex items-center justify-center gap-2">
-                <i class="fa-solid fa-ticket"></i>
-                兑换贴贴券
-            </button>
-        </div>
-
-    </main>
-
-    <footer class="absolute bottom-4 w-full text-center text-xs text-gray-400 font-light z-10">
-        Made with <i class="fa-solid fa-heart text-red-400 mx-1 animate-pulse"></i> for Xiao Fei
-    </footer>
-
-    <div id="letter-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0" id="letter-overlay" onclick="closeModal('letter-modal')"></div>
-        
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-2xl h-[80vh] bg-[#FDFBF7] rounded-xl shadow-2xl transform scale-95 opacity-0 transition-all duration-500 flex flex-col overflow-hidden" id="letter-content">
-            <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');"></div>
-            
-            <button onclick="closeModal('letter-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-love-accent z-10 transition-colors">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-
-            <div class="overflow-y-auto p-8 md:p-12 custom-scrollbar relative z-0 h-full">
-                <p class="font-hand text-xl text-gray-500 mb-8 text-right">2025.11.19</p>
-                
-                <h2 class="font-serif text-2xl font-bold text-gray-800 mb-6">致我亲爱的小菲：</h2>
-                
-                <div class="font-serif text-lg text-gray-700 leading-loose space-y-6">
-                    <p>展信佳。</p>
-                    <p>
-                        想你！想你！想你！想你！想你！想你！想你！想你！想你！
-                    </p>
-                    <p>
-                        在忙啥，不要心情不好哦，你的小弟弟一直在，有什么烦心事，记得讲，小傻瓜。
-                    </p>
-                    <p>
-                        未来的路还很长，我想牵着你的手，从清晨到日暮，从心动到古稀。（然后我们每天都去看日出，每天都贴贴）
-                    </p>
-                    <p>
-                        这封信写得很短，但爱意很长，对叭hhhhhhh。
-                    </p>
-                </div>
-
-                <div class="mt-12 text-right mb-8">
-                    <p class="font-serif text-gray-600">永远爱你的，</p>
-                    <p class="font-hand text-3xl text-love-accent mt-2 transform -rotate-6 inline-block">臭弟弟</p>
-                </div>
+            <div class="btn-container" id="btnContainer">
+                <button class="btn" onclick="celebrate()">点这里收下我的心</button>
             </div>
         </div>
     </div>
 
-    <div id="coupon-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0" id="coupon-overlay" onclick="closeModal('coupon-modal')"></div>
-        
-        <div class="relative w-11/12 max-w-md bg-white rounded-2xl shadow-2xl transform scale-95 opacity-0 transition-all duration-500 overflow-hidden" id="coupon-content">
-            <div class="h-3 bg-gradient-to-r from-love-pink to-love-accent"></div>
-            
-            <div class="p-8 text-center relative">
-                <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-800/60 backdrop-blur-sm rounded-full"></div> 
-                <div class="absolute top-1/2 -right-3 w-6 h-6 bg-gray-800/60 backdrop-blur-sm rounded-full"></div>
-
-                <h3 class="text-gray-400 text-xs tracking-[0.3em] uppercase mb-2">Exclusive Ticket</h3>
-                <h2 class="font-serif text-3xl font-bold text-love-accent mb-2">无限期贴贴券</h2>
-                <p class="text-gray-500 text-sm mb-6">凭此券可兑换 "臭弟弟" 的...(害羞，你懂的宝贝)...一次</p>
-                
-                <div class="w-full border-b-2 border-dashed border-gray-200 my-6 relative"></div>
-
-                <div class="space-y-2 text-xs text-gray-400 mb-8">
-                    <p>有效期：永久有效</p>
-                    <p>适用范围：仅限小菲使用</p>
-                    <p>特殊条款：最终解释权归发券人所有</p>
-                </div>
-
-                <button id="redeem-btn" onclick="redeemCoupon()" class="w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-all shadow-lg active:scale-95">
-                    立即兑换
-                </button>
-
-                <div id="stamp" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-love-accent rounded-full flex items-center justify-center opacity-0 pointer-events-none transform scale-150 rotate-[-20deg] transition-all duration-300 z-20 mix-blend-multiply">
-                    <div class="w-28 h-28 border-2 border-love-accent rounded-full flex items-center justify-center">
-                        <span class="text-love-accent font-black text-xl uppercase transform rotate-[-10deg]">已兑换<br>REDEEMED</span>
-                    </div>
-                </div>
-            </div>
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3>姐姐，生日快乐！</h3>
+            <p>余生请多指教呀~汪！🐶</p>
+            <button class="modal-btn" onclick="closeModal()">好的收到 ❤️</button>
         </div>
     </div>
 
     <script>
-        // --- 爱心点击特效 ---
-        function createHeart(event) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤';
-            heart.style.position = 'fixed';
-            heart.style.left = (event.clientX) + 'px';
-            heart.style.top = (event.clientY) + 'px';
-            heart.style.color = '#D4878C';
-            heart.style.fontSize = '24px';
-            heart.style.pointerEvents = 'none';
-            heart.style.transform = 'translate(-50%, -50%)';
-            heart.style.animation = 'floatUp 1s ease-out forwards';
-            heart.style.zIndex = '100'; 
-            
-            document.body.appendChild(heart);
+        // --- 1. 背景粒子特效 (Canvas) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
 
-            // 动态添加动画样式
-            if(!document.getElementById('heart-style')) {
-                const style = document.createElement('style');
-                style.id = 'heart-style';
-                style.innerHTML = `
-                    @keyframes floatUp {
-                        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                        100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
-                    }
-                `;
-                document.head.appendChild(style);
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.reset();
             }
-
-            setTimeout(() => { heart.remove(); }, 1000);
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 0.5;
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.fade = Math.random() * 0.01 + 0.005;
+                this.growing = true;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.growing) {
+                    this.alpha += this.fade;
+                    if (this.alpha >= 0.8) this.growing = false;
+                } else {
+                    this.alpha -= this.fade;
+                    if (this.alpha <= 0.1) this.growing = true;
+                }
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 182, 193, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        // 全局点击监听 (排除按钮和弹窗内容)
-        document.addEventListener('click', function(e) {
-            const isButton = e.target.closest('button');
-            const isModalContent = e.target.closest('#letter-content') || e.target.closest('#coupon-content');
-            if(!isButton && !isModalContent) {
-                createHeart(e);
-            }
+        for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // --- 2. 3D 视差效果 (PC端) ---
+        const container = document.getElementById('cardContainer');
+        const card = document.getElementById('mainCard');
+        
+        container.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         });
 
-        // --- 模态框控制 ---
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            const overlay = modal.querySelector('div[id$="-overlay"]');
-            const content = modal.querySelector('div[id$="-content"]');
+        container.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+
+        container.addEventListener('mouseleave', () => {
+            card.style.transition = 'transform 0.5s ease';
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        // --- 3. 文字逐行浮现动画 ---
+        const contentDiv = document.getElementById('textContent');
+        const paragraphs = contentDiv.getElementsByTagName('p');
+        const footer = document.getElementById('footer');
+        const btnContainer = document.getElementById('btnContainer');
+
+        // 将每个 P 标签加类名处理
+        Array.from(paragraphs).forEach((p, index) => {
+            p.classList.add('text-line');
+            p.style.transitionDelay = `${index * 0.5 + 0.5}s`; // 延迟显示
+        });
+
+        // 页面加载后触发
+        window.onload = () => {
+            Array.from(paragraphs).forEach(p => p.classList.add('visible'));
             
-            modal.classList.remove('hidden');
+            // 文本显示完后显示落款和按钮
             setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                content.classList.remove('opacity-0', 'scale-95');
-                content.classList.add('scale-100');
-            }, 10);
-        }
+                footer.style.opacity = '1';
+                footer.style.transition = 'opacity 1s ease';
+            }, paragraphs.length * 500 + 500);
 
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            const overlay = modal.querySelector('div[id$="-overlay"]');
-            const content = modal.querySelector('div[id$="-content"]');
-            
-            overlay.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('opacity-0', 'scale-95');
-            
             setTimeout(() => {
-                modal.classList.add('hidden');
-                if(modalId === 'coupon-modal') resetCoupon();
-            }, 300);
-        }
+                btnContainer.style.opacity = '1';
+                btnContainer.style.transition = 'opacity 1s ease';
+            }, paragraphs.length * 500 + 1000);
+        };
 
-        // --- 优惠券逻辑 ---
-        function redeemCoupon() {
-            const btn = document.getElementById('redeem-btn');
-            const stamp = document.getElementById('stamp');
-            
-            // 按钮状态改变
-            btn.innerText = "兑换成功！";
-            btn.className = "w-full py-3 rounded-xl bg-green-500 text-white font-bold shadow-lg cursor-default";
-            btn.disabled = true;
+        // --- 4. 点击交互 (爆炸特效) ---
+        function createHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.innerHTML = ['❤️', '💖', '✨', '🎂'][Math.floor(Math.random() * 4)];
+            heart.style.position = 'fixed';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            document.body.appendChild(heart);
 
-            // 盖章动画
-            stamp.classList.remove('opacity-0', 'scale-150');
-            stamp.classList.add('opacity-80', 'scale-100');
+            // 随机运动方向
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 150 + 50;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
 
-            // 触发撒花
-            for(let i=0; i<30; i++) {
-                setTimeout(createConfetti, i * 50);
+            let startTime = null;
+
+            function animate(time) {
+                if (!startTime) startTime = time;
+                const progress = (time - startTime) / 1000;
+
+                if (progress < 1) {
+                    heart.style.left = (x + vx * progress) + 'px';
+                    heart.style.top = (y + vy * progress + 200 * progress * progress) + 'px'; // 模拟重力
+                    heart.style.opacity = 1 - progress;
+                    requestAnimationFrame(animate);
+                } else {
+                    heart.remove();
+                }
             }
+            requestAnimationFrame(animate);
         }
 
-        function resetCoupon() {
-            const btn = document.getElementById('redeem-btn');
-            const stamp = document.getElementById('stamp');
-            
+        function celebrate() {
+            const btn = document.querySelector('.btn');
+            const rect = btn.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // 生成爆炸爱心
+            for(let i=0; i<50; i++) {
+                setTimeout(() => createHeart(centerX, centerY), i * 10);
+            }
+
+            // 显示模态框
             setTimeout(() => {
-                btn.innerText = "立即兑换";
-                btn.className = "w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-all shadow-lg active:scale-95";
-                btn.disabled = false;
-                
-                stamp.classList.add('opacity-0', 'scale-150');
-                stamp.classList.remove('opacity-80', 'scale-100');
-            }, 300);
+                document.getElementById('modal').classList.add('active');
+            }, 600);
         }
 
-        // --- 撒花特效 ---
-        function createConfetti() {
-            const colors = ['#ECC8C5', '#D4878C', '#F7E7CE', '#FFD700'];
-            const confetti = document.createElement('div');
-            const content = document.getElementById('coupon-content');
-            
-            // 防止 content 找不到报错
-            if (!content) return;
-
-            const rect = content.getBoundingClientRect();
-            
-            confetti.style.position = 'fixed';
-            confetti.style.left = (rect.left + rect.width / 2) + 'px';
-            confetti.style.top = (rect.top + rect.height / 2) + 'px';
-            confetti.style.width = '8px';
-            confetti.style.height = '8px';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.borderRadius = '50%';
-            confetti.style.zIndex = '60';
-            
-            const x = (Math.random() - 0.5) * 300;
-            const y = (Math.random() - 0.5) * 300;
-            
-            confetti.style.transition = 'all 1s ease-out';
-            document.body.appendChild(confetti);
-            
-            // 下一帧触发位移
-            requestAnimationFrame(() => {
-                confetti.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random()*360}deg)`;
-                confetti.style.opacity = 0;
-            });
-
-            setTimeout(() => confetti.remove(), 1000);
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
         }
     </script>
 </body>
