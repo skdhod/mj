@@ -3,164 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MJ.WZ | Portfolio</title>
+    <title>MJ.WZ | Digital Garden</title>
     <style>
         :root {
             --bg: #000000;
             --text: #ffffff;
             --secondary: #86868b;
             --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        body { background-color: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Nav Bar */
         nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 44px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-            color: var(--secondary);
+            position: fixed; top: 0; width: 100%; height: 50px;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
+            z-index: 100; display: flex; justify-content: center; align-items: center; gap: 30px;
+            font-size: 13px; border-bottom: 1px solid var(--border);
         }
-
-        nav a {
-            color: var(--secondary);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
+        nav a { color: var(--secondary); text-decoration: none; transition: 0.3s; }
         nav a:hover { color: #fff; }
 
-        /* Hero Section */
         .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
+            height: 80vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center;
         }
-
         .hero h1 {
-            font-size: clamp(48px, 8vw, 120px);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin-bottom: 10px;
-            background: linear-gradient(180deg, #fff 0%, #86868b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: clamp(60px, 10vw, 120px); font-weight: 600; letter-spacing: -0.03em;
+            background: linear-gradient(180deg, #fff 30%, #555 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+        .hero p { font-size: 20px; color: var(--secondary); margin-top: 10px; }
 
-        .hero p {
-            font-size: 24px;
-            color: var(--secondary);
-            font-weight: 400;
-            max-width: 600px;
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px 100px; }
+        
+        /* 文章列表样式 */
+        .section-title { color: var(--secondary); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        
+        .journal-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
+        .post-item { 
+            background: var(--bg); padding: 25px 30px; text-decoration: none; 
+            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
         }
+        .post-item:hover { background: var(--glass); }
+        .post-info h3 { font-size: 20px; color: #fff; font-weight: 500; }
+        .post-info span { color: var(--secondary); font-size: 14px; margin-top: 5px; display: block; }
+        .arrow { color: var(--secondary); font-size: 20px; }
 
-        /* Bento Grid */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 20px;
-            display: grid;
-            grid-template-columns: repeat(12, 1-fr);
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--glass);
-            border-radius: 28px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
-        }
-
-        .card:hover {
-            transform: scale(1.02);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .large { grid-column: span 8; }
-        .small { grid-column: span 4; }
-
-        h2 { font-size: 32px; margin-bottom: 10px; }
-        .card p { color: var(--secondary); line-height: 1.5; }
-
-        .cta {
-            margin-top: 50px;
-            padding: 12px 24px;
-            border-radius: 99px;
-            background: #fff;
-            color: #000;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            transition: opacity 0.3s;
-        }
-
-        .cta:hover { opacity: 0.8; }
-
-        @media (max-width: 768px) {
-            .large, .small { grid-column: span 12; }
-        }
+        footer { text-align: center; padding: 50px; color: #444; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <nav>
-        <a href="#">Journal</a>
-        <a href="#">Projects</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+        <a href="/">Home</a>
+        <a href="https://github.com/skdhod">GitHub</a>
     </nav>
 
     <section class="hero">
         <h1>MJ.WZ</h1>
-        <p>Design simple. Build bold.</p>
-        <a href="#work" class="cta">Get in touch</a>
+        <p>Welcome to my digital space.</p>
     </section>
 
-    <section id="work" class="container">
-        <div class="card large">
-            <h2>Latest Thoughts</h2>
-            <p>Exploring the intersection of minimalism and machine intelligence.</p>
-        </div>
-        <div class="card small">
-            <h2>Archive</h2>
-            <p>A collection of past experiments.</p>
-        </div>
-        <div class="card small">
-            <h2>Lab</h2>
-            <p>Code snippets & UI kits.</p>
-        </div>
-        <div class="card large">
-            <h2>Current Project</h2>
-            <p>Building a new era of digital interfaces in 2026.</p>
-        </div>
-    </section>
+    <main class="container">
+        <p class="section-title">Latest Journal</p>
+        <div class="journal-list">
+            
+            <a href="posts/my-first-blog.html" class="post-item">
+                <div class="post-info">
+                    <h3>Hello World: 第一篇博客</h3>
+                    <span>February 1, 2026</span>
+                </div>
+                <div class="arrow">→</div>
+            </a>
+            </div>
+    </main>
+
+    <footer>
+        &copy; 2026 MJ.WZ. Designed for the minimalist.
+    </footer>
 
 </body>
 </html>
